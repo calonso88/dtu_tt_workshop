@@ -18,13 +18,26 @@ module tb ();
   reg rst_n;
   reg ena;
   reg [7:0] ui_in;
-  reg [7:0] uio_in;
+  reg [7:0] uio_in_ext;
+  wire [7:0] uio_in;
+
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+`ifdef GL_TEST
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
 
   // Replace tt_um_example with your module name:
-  tt_um_example user_project (
+  tt_um_calonso88_spi_i2c_reg_bank user_project (
+
+      // Include power ports for the Gate Level test:
+`ifdef GL_TEST
+      .VPWR(VPWR),
+      .VGND(VGND),
+`endif
+
       .ui_in  (ui_in),    // Dedicated inputs
       .uo_out (uo_out),   // Dedicated outputs
       .uio_in (uio_in),   // IOs: Input path
@@ -34,5 +47,23 @@ module tb ();
       .clk    (clk),      // clock
       .rst_n  (rst_n)     // not reset
   );
+
+  wire i2c_sda_i, i2c_scl;
+  wire spi_cs_n_i, spi_clk_i, spi_mosi_i, spi_miso_o;
+
+  // Tri-state logic for i2c
+  wire i2c_sda     = uio_oe[1] ? uio_out[1] : 1'b1;
+  assign uio_in[1] = i2c_sda_i;
+  assign uio_in[2] = i2c_scl;
+
+  assign uio_in[0] = uio_in_ext[0];
+  assign uio_in[3] = uio_in_ext[3];
+  assign uio_in[7] = uio_in_ext[7];
+
+  assign uio_in[4] = spi_cs_n_i;
+  assign uio_in[5] = spi_clk_i;
+  assign uio_in[6] = spi_mosi_i;
+
+  assign spi_miso_o = uio_oe[3] ? uio_out[3] : 1'bz;
 
 endmodule
