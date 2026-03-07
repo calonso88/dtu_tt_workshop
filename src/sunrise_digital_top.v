@@ -62,7 +62,7 @@ module sunrise_digital_top (
 
   // Reset synchronizer
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_prot_sel (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(1'b1), .data_out(rst_sync));
+  sync_reset (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(1'b1), .data_out(rst_sync));
   // Synchronizers for protocol selector
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
   sync_input_prot_sel (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(protocol_sel_i), .data_out(protrocol_sel_sync));
