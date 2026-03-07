@@ -58,27 +58,32 @@ module sunrise_digital_top (
   wire i2c_addr1_sync;
   wire i2c_addr2_sync;
 
+  wire rst_sync;
+
+  // Reset synchronizer
+  synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
+  sync_input_prot_sel (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(1'b1), .data_out(rst_sync));
   // Synchronizers for protocol selector
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_prot_sel (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(protocol_sel_i), .data_out(protrocol_sel_sync));
+  sync_input_prot_sel (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(protocol_sel_i), .data_out(protrocol_sel_sync));
   // Synchronizers for spi inputs
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_spi_cpol (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_cpol_i), .data_out(cpol_sync));
+  sync_input_spi_cpol (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(spi_cpol_i), .data_out(cpol_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_spi_cpha (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_cpha_i), .data_out(cpha_sync));
+  sync_input_spi_cpha (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(spi_cpha_i), .data_out(cpha_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_spi_cs_n (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_cs_n_i), .data_out(spi_cs_n_sync));
+  sync_input_spi_cs_n (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(spi_cs_n_i), .data_out(spi_cs_n_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_spi_clk  (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_clk_i),  .data_out(spi_clk_sync));
+  sync_input_spi_clk  (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(spi_clk_i),  .data_out(spi_clk_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_spi_mosi (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_mosi_i), .data_out(spi_mosi_sync));
+  sync_input_spi_mosi (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(spi_mosi_i), .data_out(spi_mosi_sync));
   // Synchronizers for i2c Addrs
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_i2c_addr0 (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(i2c_addr0_i), .data_out(i2c_addr0_sync));
+  sync_input_i2c_addr0 (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(i2c_addr0_i), .data_out(i2c_addr0_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_i2c_addr1 (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(i2c_addr1_i), .data_out(i2c_addr1_sync));
+  sync_input_i2c_addr1 (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(i2c_addr1_i), .data_out(i2c_addr1_sync));
   synchronizer #(.STAGES(SYNC_STAGES), .WIDTH(SYNC_WIDTH))
-  sync_input_i2c_addr2 (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(i2c_addr2_i), .data_out(i2c_addr2_sync));
+  sync_input_i2c_addr2 (.rstb(rst_sync), .clk(clk), .ena(ena), .data_in(i2c_addr2_i), .data_out(i2c_addr2_sync));
 
   // Assign status
   assign ro_regs[7:0]   = 8'hCA;
@@ -96,7 +101,7 @@ module sunrise_digital_top (
     .NUM_STATUS(NUM_STATUS),
     .REG_WIDTH(REG_WIDTH)
   ) top_wrapper_i (
-    .rstb(rst_n),
+    .rstb(rst_sync),
     .clk(clk),
     .ena(ena),
     .mode({cpol_sync, cpha_sync}),
